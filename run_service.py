@@ -607,10 +607,6 @@ def main() -> None:
         os.environ["OPEN_AUTONOMY_SUBGRAPH_URL"] = (
             "https://subgraph.autonolas.tech/subgraphs/name/autonolas-staging"
         )
-        os.environ["MAX_PRIORITY_FEE_PER_GAS"] = chain_metadata["gasParams"][
-            "MAX_PRIORITY_FEE_PER_GAS"
-        ]
-        os.environ["MAX_FEE_PER_GAS"] = chain_metadata["gasParams"]["MAX_FEE_PER_GAS"]
         service_exists = (
             manager._get_on_chain_state(chain_config) != OnChainState.NON_EXISTENT
         )
@@ -733,6 +729,10 @@ def main() -> None:
         "MINIMUM_GAS_BALANCE": 0.02,
         "DB_PATH": "/logs/mech.db",
         "STAKING_TOKEN_CONTRACT_ADDRESS": STAKING[home_chain_type]["mech_marketplace"],
+        "TOOLS_TO_PACKAGE_HASH": mech_quickstart_config.tools_to_packages_hash,
+        "API_KEYS": mech_quickstart_config.api_keys,
+        "MECH_TO_SUBSCRIPTION": mech_quickstart_config.mech_to_subscription,
+        "MECH_TO_CONFIG": mech_quickstart_config.mech_to_config,
     }
     apply_env_vars(env_vars)
 
