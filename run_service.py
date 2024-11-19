@@ -73,6 +73,7 @@ OPERATE_HOME = Path.cwd() / ".mech_quickstart"
 DEFAULT_TOOLS_TO_PACKAGE_HASH = None
 DEFAULT_MECH_TO_SUBSCRIPTION = None
 DEFAULT_MECH_TO_CONFIG = None
+DEFAULT_MECH_HASH = "bafybeiceat2qaz7bqrpgobj3qiubjqyzehydexku2qhe6ob4w2woaehunq"
 
 
 CHAIN_ID_TO_METADATA = {
@@ -146,6 +147,7 @@ class MechQuickstartConfig(LocalResource):
     tools_to_packages_hash: t.Optional[dict] = None
     mech_to_subscription: t.Optional[dict] = None
     mech_to_config: t.Optional[dict] = None
+    mech_hash: t.Optional[str] = None
 
     @classmethod
     def from_json(cls, obj: t.Dict) -> "LocalResource":
@@ -381,6 +383,21 @@ def get_local_config() -> MechQuickstartConfig:
         else:
             mech_quickstart_config.mech_to_config = DEFAULT_MECH_TO_CONFIG
 
+    if mech_quickstart_config.mech_hash is None:
+        mech_hash = (
+            input(
+                f"Do you want to set the mech_hash dict(set to {DEFAULT_MECH_HASH})? (y/n): "
+            ).lower()
+            == "y"
+        )
+        if mech_hash:
+            while True:
+                user_input = input(f"Please enter the mech_hash: ")
+                mech_quickstart_config.mech_hash = user_input
+                break
+        else:
+            mech_quickstart_config.mech_hash = DEFAULT_MECH_HASH
+
     mech_quickstart_config.store()
     return mech_quickstart_config
 
@@ -397,7 +414,7 @@ def get_service_template(config: MechQuickstartConfig) -> ServiceTemplate:
     return ServiceTemplate(
         {
             "name": "mech_quickstart",
-            "hash": "bafybeiceat2qaz7bqrpgobj3qiubjqyzehydexku2qhe6ob4w2woaehunq",
+            "hash": f"{config.mech_hash}",
             "description": "The mech executes AI tasks requested on-chain and delivers the results to the requester.",
             "image": "https://gateway.autonolas.tech/ipfs/bafybeidzpenez565d7vp7jexfrwisa2wijzx6vwcffli57buznyyqkrceq",
             "service_version": "v0.1.0",
