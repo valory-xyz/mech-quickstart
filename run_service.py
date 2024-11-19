@@ -392,27 +392,6 @@ def apply_env_vars(env_vars: t.Dict[str, str]) -> None:
             os.environ[key] = str(value)
 
 
-def handle_password_migration(
-    operate: OperateApp, config: MechQuickstartConfig
-) -> t.Optional[str]:
-    """Handle password migration."""
-    if not config.password_migrated:
-        print("Add password...")
-        old_password, new_password = "12345", ask_confirm_password()
-        operate.user_account.update(old_password, new_password)
-        if operate.wallet_manager.exists(LedgerType.ETHEREUM):
-            operate.password = old_password
-            wallet = operate.wallet_manager.load(LedgerType.ETHEREUM)
-            wallet.crypto.dump(str(wallet.key_path), password=new_password)
-            wallet.password = new_password
-            wallet.store()
-
-        config.password_migrated = True
-        config.store()
-        return new_password
-    return None
-
-
 def get_service_template(config: MechQuickstartConfig) -> ServiceTemplate:
     """Get the service template"""
     return ServiceTemplate(
@@ -572,15 +551,6 @@ def main() -> None:
         )
         mech_quickstart_config.password_migrated = True
         mech_quickstart_config.store()
-
-    # Load account
-    else:
-        password = handle_password_migration(operate, mech_quickstart_config)
-        if password is None:
-            password = getpass.getpass("Enter local user account password: ")
-        if not operate.user_account.is_valid(password=password):
-            print("Invalid password!")
-            sys.exit(1)
 
     operate.password = password
 
