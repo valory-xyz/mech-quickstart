@@ -424,7 +424,7 @@ def get_service_template(config: MechQuickstartConfig) -> ServiceTemplate:
                     {
                         "staking_program_id": "mech_service",
                         "rpc": config.gnosis_rpc,
-                        "nft": "",
+                        "nft": "bafybeiaakdeconw7j5z76fgghfdjmsr6tzejotxcwnvmp3nroaw3glgyve",
                         "cost_of_bond": COST_OF_BOND,
                         "threshold": 1,
                         "use_staking": True,
