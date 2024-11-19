@@ -23,6 +23,7 @@ import json
 import os
 import sys
 import time
+import ast
 import typing as t
 from dataclasses import dataclass
 from pathlib import Path
@@ -58,10 +59,10 @@ def unit_to_wei(unit: float) -> int:
     return int(unit * 1e18)
 
 
-WALLET_TOPUP = unit_to_wei(0.005)
-MASTER_SAFE_TOPUP = unit_to_wei(0.001)
-SAFE_TOPUP = unit_to_wei(0.002)
-AGENT_TOPUP = unit_to_wei(0.001)
+WALLET_TOPUP = unit_to_wei(0.5)
+MASTER_SAFE_TOPUP = unit_to_wei(0.5)
+SAFE_TOPUP = unit_to_wei(0.5)
+AGENT_TOPUP = unit_to_wei(0.5)
 
 
 COST_OF_BOND = 1
@@ -69,14 +70,17 @@ COST_OF_STAKING = 10**20  # 100 OLAS
 COST_OF_BOND_STAKING = 5 * 10**19  # 50 OLAS
 WARNING_ICON = colored("\u26A0", "yellow")
 OPERATE_HOME = Path.cwd() / ".mech_quickstart"
+DEFAULT_TOOLS_TO_PACKAGE_HASH = None
+DEFAULT_MECH_TO_SUBSCRIPTION = None
+DEFAULT_MECH_TO_CONFIG = None
 
 
 CHAIN_ID_TO_METADATA = {
     100: {
         "name": "Gnosis",
         "token": "xDAI",
-        "firstTimeTopUp": unit_to_wei(0.001),
-        "operationalFundReq": unit_to_wei(0.001),
+        "firstTimeTopUp": unit_to_wei(0.5),
+        "operationalFundReq": unit_to_wei(0.5),
         "usdcRequired": False,
         "gasParams": {
             # this means default values will be used
@@ -137,9 +141,11 @@ class MechQuickstartConfig(LocalResource):
 
     path: Path
     gnosis_rpc: t.Optional[str] = None
-    password_migrated: t.Optional[bool] = None
-    use_staking: t.Optional[bool] = None
     home_chain_id: t.Optional[int] = None
+    api_keys: t.Optional[dict] = None
+    tools_to_packages_hash: t.Optional[dict] = None
+    mech_to_subscription: t.Optional[dict] = None
+    mech_to_config: t.Optional[dict] = None
 
     @classmethod
     def from_json(cls, obj: t.Dict) -> "LocalResource":
@@ -300,8 +306,80 @@ def get_local_config() -> MechQuickstartConfig:
             f"Please enter a {ChainType.from_id(mech_quickstart_config.home_chain_id).name} RPC URL: "
         )
 
-    if mech_quickstart_config.password_migrated is None:
-        mech_quickstart_config.password_migrated = False
+    if mech_quickstart_config.tools_to_packages_hash is None:
+        tools_to_packages_hash = (
+            input(
+                f"Do you want to set the tools_to_packages_hash dict(set to {DEFAULT_TOOLS_TO_PACKAGE_HASH})? (y/n): "
+            ).lower()
+            == "y"
+        )
+        if tools_to_packages_hash:
+            while True:
+                user_input = input(f"Please enter the tools_to_packages_hash dict: ")
+                tools_to_packages_hash = ast.literal_eval(user_input)
+                if not isinstance(tools_to_packages_hash, dict):
+                    print("Error: Please enter a valid dict.")
+                    continue
+                else:
+                    mech_quickstart_config.tools_to_packages_hash = (
+                        tools_to_packages_hash
+                    )
+                    break
+        else:
+            mech_quickstart_config.tools_to_packages_hash = (
+                DEFAULT_TOOLS_TO_PACKAGE_HASH
+            )
+
+    if mech_quickstart_config.api_keys is None:
+        user_input = input(f"Add API keys required to run your tools: ")
+        while True:
+            api_keys = ast.literal_eval(user_input)
+            if not isinstance(api_keys, dict):
+                print("Error: Please enter a valid dict.")
+                continue
+            else:
+                mech_quickstart_config.api_keys = api_keys
+                break
+
+    if mech_quickstart_config.mech_to_subscription is None:
+        mech_to_subscription = (
+            input(
+                f"Do you want to set the mech_to_subscription dict(set to {DEFAULT_MECH_TO_SUBSCRIPTION})? (y/n): "
+            ).lower()
+            == "y"
+        )
+        if mech_to_subscription:
+            while True:
+                user_input = input(f"Please enter the mech_to_subscription dict: ")
+                mech_to_subscription = ast.literal_eval(user_input)
+                if not isinstance(mech_to_subscription, dict):
+                    print("Error: Please enter a valid dict.")
+                    continue
+                else:
+                    mech_quickstart_config.mech_to_subscription = mech_to_subscription
+                    break
+        else:
+            mech_quickstart_config.mech_to_subscription = DEFAULT_MECH_TO_SUBSCRIPTION
+
+    if mech_quickstart_config.mech_to_config is None:
+        mech_to_config = (
+            input(
+                f"Do you want to set the mech_to_config dict(set to {DEFAULT_MECH_TO_CONFIG})? (y/n): "
+            ).lower()
+            == "y"
+        )
+        if mech_to_config:
+            while True:
+                user_input = input(f"Please enter the mech_to_config dict: ")
+                mech_to_config = ast.literal_eval(user_input)
+                if not isinstance(mech_to_config, dict):
+                    print("Error: Please enter a valid dict.")
+                    continue
+                else:
+                    mech_quickstart_config.mech_to_config = mech_to_config
+                    break
+        else:
+            mech_quickstart_config.mech_to_config = DEFAULT_MECH_TO_CONFIG
 
     mech_quickstart_config.store()
     return mech_quickstart_config
