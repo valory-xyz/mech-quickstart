@@ -422,7 +422,7 @@ def get_service_template(config: MechQuickstartConfig) -> ServiceTemplate:
             "configurations": {
                 str(config.home_chain_id): ConfigurationTemplate(
                     {
-                        "staking_program_id": "mech_service",
+                        "staking_program_id": "mech_marketplace",
                         "rpc": config.gnosis_rpc,
                         "nft": "bafybeiaakdeconw7j5z76fgghfdjmsr6tzejotxcwnvmp3nroaw3glgyve",
                         "cost_of_bond": COST_OF_BOND,
@@ -466,11 +466,13 @@ def get_erc20_balance(ledger_api: LedgerApi, token: str, account: str) -> int:
 
 
 # @note patching operate -> legder -> profiles.py -> staking dict for gnosis
-STAKING[ChainType.GNOSIS]["mech_service"] = "0x998dEFafD094817EF329f6dc79c703f1CF18bC90"
+STAKING[ChainType.GNOSIS][
+    "mech_marketplace"
+] = "0x998dEFafD094817EF329f6dc79c703f1CF18bC90"
 gnosis_staking_fallback = dict(
     agent_ids=[43],
     service_registry=CONTRACTS[ChainType.GNOSIS]["service_registry"],  # nosec
-    staking_token=STAKING[ChainType.GNOSIS]["mech_service"],  # nosec
+    staking_token=STAKING[ChainType.GNOSIS]["mech_marketplace"],  # nosec
     service_registry_token_utility=CONTRACTS[ChainType.GNOSIS][
         "service_registry_token_utility"
     ],  # nosec
@@ -730,7 +732,7 @@ def main() -> None:
         "RESET_PAUSE_DURATION": 10,
         "MINIMUM_GAS_BALANCE": 0.02,
         "DB_PATH": "/logs/mech.db",
-        "STAKING_TOKEN_CONTRACT_ADDRESS": STAKING[home_chain_type]["mech_service"],
+        "STAKING_TOKEN_CONTRACT_ADDRESS": STAKING[home_chain_type]["mech_marketplace"],
     }
     apply_env_vars(env_vars)
 
