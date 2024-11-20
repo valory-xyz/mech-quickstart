@@ -54,6 +54,7 @@ COST_OF_BOND = 1
 COST_OF_STAKING = 10**20  # 100 OLAS
 COST_OF_BOND_STAKING = 5 * 10**19  # 50 OLAS
 
+
 CHAIN_ID_TO_METADATA = {
     100: {
         "name": "Gnosis",
@@ -89,7 +90,7 @@ def get_service_template(config: MechQuickstartConfig) -> ServiceTemplate:
     return ServiceTemplate(
         {
             "name": "mech_quickstart",
-            "hash": "bafybeibx772eooap6m7cdjwfyt5pespe22i2mva24y255vw22cd5d7bfuq",
+            "hash": str(config.mech_hash),
             "description": "The mech executes AI tasks requested on-chain and delivers the results to the requester.",
             "image": "https://gateway.autonolas.tech/ipfs/bafybeidzpenez565d7vp7jexfrwisa2wijzx6vwcffli57buznyyqkrceq",
             "service_version": "v0.1.0",
@@ -97,7 +98,7 @@ def get_service_template(config: MechQuickstartConfig) -> ServiceTemplate:
             "configurations": {
                 str(config.home_chain_id): ConfigurationTemplate(
                     {
-                        "staking_program_id": "mech_service",
+                        "staking_program_id": "mech_marketplace",
                         "rpc": config.gnosis_rpc,
                         "nft": "bafybeifgj3kackzfoq4fxjiuousm6epgwx7jbc3n2gjwzjgvtbbz7fc3su",
                         "cost_of_bond": COST_OF_BOND,
@@ -144,15 +145,6 @@ def main() -> None:
         mech_quickstart_config.password_migrated = True
         mech_quickstart_config.store()
 
-    # Load account
-    else:
-        password = handle_password_migration(operate, mech_quickstart_config)
-        if password is None:
-            password = getpass.getpass("Enter local user account password: ")
-        if not operate.user_account.is_valid(password=password):
-            print("Invalid password!")
-            sys.exit(1)
-
     operate.password = password
 
     # Create the main wallet
@@ -189,10 +181,6 @@ def main() -> None:
         os.environ["OPEN_AUTONOMY_SUBGRAPH_URL"] = (
             "https://subgraph.autonolas.tech/subgraphs/name/autonolas-staging"
         )
-        os.environ["MAX_PRIORITY_FEE_PER_GAS"] = chain_metadata["gasParams"][
-            "MAX_PRIORITY_FEE_PER_GAS"
-        ]
-        os.environ["MAX_FEE_PER_GAS"] = chain_metadata["gasParams"]["MAX_FEE_PER_GAS"]
         service_exists = (
             manager._get_on_chain_state(chain_config) != OnChainState.NON_EXISTENT
         )
@@ -326,6 +314,7 @@ def main() -> None:
         "METADATA_HASH": mech_quickstart_config.metadata_hash,
         "MECH_TO_CONFIG": json.dumps(mech_to_config, separators=(',', ':')),
         "ON_CHAIN_SERVICE_ID": service.chain_configs[home_chain_id].chain_data.token,
+        "TOOLS_TO_PACKAGE_HASH": mech_quickstart_config.tools_to_packages_hash,
     }
     apply_env_vars(env_vars)
 

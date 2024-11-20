@@ -1,4 +1,5 @@
 # utils.py
+import ast
 import getpass
 import json
 import os
@@ -37,6 +38,10 @@ logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 WARNING_ICON = colored("\u26A0", "yellow")
 OPERATE_HOME = Path.cwd() / ".mech_quickstart"
+DEFAULT_TOOLS_TO_PACKAGE_HASH = None
+DEFAULT_MECH_TO_SUBSCRIPTION = None
+DEFAULT_MECH_TO_CONFIG = None
+DEFAULT_MECH_HASH = "bafybeibx772eooap6m7cdjwfyt5pespe22i2mva24y255vw22cd5d7bfuq"
 
 @dataclass
 class MechQuickstartConfig(LocalResource):
@@ -50,6 +55,8 @@ class MechQuickstartConfig(LocalResource):
     metadata_hash: t.Optional[str] = None
     agent_id: t.Optional[int] = None
     mech_address: t.Optional[str] = None
+    tools_to_packages_hash: t.Optional[dict] = None
+    mech_hash: t.Optional[str] = None
     home_chain_id: t.Optional[int] = None
 
     @classmethod
@@ -329,6 +336,46 @@ def get_local_config() -> MechQuickstartConfig:
     if mech_quickstart_config.metadata_hash is None:
         # TODO: default value is not a good idea here, we need to think of better ways to do this.
         mech_quickstart_config.metadata_hash = input_with_default_value("Please provide the metadata hash", "f01701220caa53607238e340da63b296acab232c18a48e954f0af6ff2b835b2d93f1962f0")
+
+    if mech_quickstart_config.tools_to_packages_hash is None:
+        tools_to_packages_hash = (
+            input(
+                f"Do you want to set the tools_to_packages_hash dict(set to {DEFAULT_TOOLS_TO_PACKAGE_HASH})? (y/n): "
+            ).lower()
+            == "y"
+        )
+        if tools_to_packages_hash:
+            while True:
+                user_input = input(f"Please enter the tools_to_packages_hash dict: ")
+                tools_to_packages_hash = ast.literal_eval(user_input)
+                if not isinstance(tools_to_packages_hash, dict):
+                    print("Error: Please enter a valid dict.")
+                    continue
+                else:
+                    mech_quickstart_config.tools_to_packages_hash = (
+                        tools_to_packages_hash
+                    )
+                    break
+        else:
+            mech_quickstart_config.tools_to_packages_hash = (
+                DEFAULT_TOOLS_TO_PACKAGE_HASH
+            )
+
+    if mech_quickstart_config.mech_hash is None:
+        mech_hash = (
+                input(
+                    f"Do you want to set the mech_hash dict(set to {DEFAULT_MECH_HASH})? (y/n): "
+                ).lower()
+                == "y"
+        )
+        if mech_hash:
+            while True:
+                user_input = input(f"Please enter the mech_hash: ")
+                mech_quickstart_config.mech_hash = user_input
+                break
+        else:
+            mech_quickstart_config.mech_hash = DEFAULT_MECH_HASH
+
 
     mech_quickstart_config.store()
     return mech_quickstart_config
