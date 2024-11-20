@@ -222,10 +222,11 @@ class ServiceBuilder(BaseServiceBuilder):
                     skill_id=component_id.public_id,
                     has_multiple_overrides=has_multiple_overrides,
                 )
-                if service_id is not None:
-                    override[0]["models"]["params"]["args"][
-                        "on_chain_service_id"
-                    ] = service_id
+                # this was causing issues
+                # if service_id is not None:
+                #     override[0]["models"]["params"]["args"][
+                #         "on_chain_service_id"
+                #     ] = service_id
 
             override["type"] = component_id.package_type.value
             override["public_id"] = str(component_id.public_id)

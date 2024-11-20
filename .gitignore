@@ -36,13 +36,11 @@ temp/
 electron/.next
 
 dist/
-build/
 
 cache
 leak_report
 
 *.dist
-*.build
 /electron/bins/
 
 # logs
@@ -55,3 +53,4 @@ local_config.json
 
 mech.db
 
+/.api_keys.json
