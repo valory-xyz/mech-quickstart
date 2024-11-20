@@ -144,6 +144,8 @@ def main() -> None:
         )
         mech_quickstart_config.password_migrated = True
         mech_quickstart_config.store()
+    else:
+        password = getpass.getpass("Enter local user account password: ")
 
     operate.password = password
 

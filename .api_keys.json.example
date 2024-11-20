@@ -1,10 +1,10 @@
 {
   "openai": [
-    "Your #1 OpenAI API key here",
-    "Your #2 OpenAI API key here"
+    "YOUR_#1_KEY_HERE",
+    "YOUR_#2_KEY_HERE"
   ],
   "google_api_key": [
-    "Your #1 Google API key here",
-    "Your #2 Google API key here"
+    "YOUR_#1_KEY_HERE",
+    "YOUR_#2_KEY_HERE"
   ]
 }

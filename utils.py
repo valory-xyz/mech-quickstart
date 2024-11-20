@@ -41,7 +41,7 @@ OPERATE_HOME = Path.cwd() / ".mech_quickstart"
 DEFAULT_TOOLS_TO_PACKAGE_HASH = None
 DEFAULT_MECH_TO_SUBSCRIPTION = None
 DEFAULT_MECH_TO_CONFIG = None
-DEFAULT_MECH_HASH = "bafybeibmz7pe7yl2toivhm3lusuqfm345by7yhcyvd5uufgjrlrwprxb7q"
+DEFAULT_MECH_HASH = "bafybeiae6wpk5vxkvgugvay237gmn6xpnk7bceahodv4xka3n2p6brqlr4"
 
 @dataclass
 class MechQuickstartConfig(LocalResource):
