@@ -317,6 +317,7 @@ def main() -> None:
         "MECH_TO_CONFIG": json.dumps(mech_to_config, separators=(',', ':')),
         "ON_CHAIN_SERVICE_ID": service.chain_configs[home_chain_id].chain_data.token,
         "TOOLS_TO_PACKAGE_HASH": mech_quickstart_config.tools_to_packages_hash,
+        "GNOSIS_RPC_0": mech_quickstart_config.gnosis_rpc,
     }
     apply_env_vars(env_vars)
 
