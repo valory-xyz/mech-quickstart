@@ -23,7 +23,6 @@ import json
 import os
 import sys
 import time
-import ast
 import typing as t
 
 from dotenv import load_dotenv
@@ -54,10 +53,6 @@ AGENT_TOPUP = unit_to_wei(1.5)
 COST_OF_BOND = 1
 COST_OF_STAKING = 10**20  # 100 OLAS
 COST_OF_BOND_STAKING = 5 * 10**19  # 50 OLAS
-DEFAULT_TOOLS_TO_PACKAGE_HASH = None
-DEFAULT_MECH_TO_SUBSCRIPTION = None
-DEFAULT_MECH_TO_CONFIG = None
-DEFAULT_MECH_HASH = "bafybeibx772eooap6m7cdjwfyt5pespe22i2mva24y255vw22cd5d7bfuq"
 
 
 CHAIN_ID_TO_METADATA = {
@@ -95,7 +90,7 @@ def get_service_template(config: MechQuickstartConfig) -> ServiceTemplate:
     return ServiceTemplate(
         {
             "name": "mech_quickstart",
-            "hash": "bafybeibx772eooap6m7cdjwfyt5pespe22i2mva24y255vw22cd5d7bfuq",
+            "hash": str(config.mech_hash),
             "description": "The mech executes AI tasks requested on-chain and delivers the results to the requester.",
             "image": "https://gateway.autonolas.tech/ipfs/bafybeidzpenez565d7vp7jexfrwisa2wijzx6vwcffli57buznyyqkrceq",
             "service_version": "v0.1.0",
