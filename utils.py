@@ -316,8 +316,7 @@ def get_local_config() -> MechQuickstartConfig:
     print_section("API Key Configuration")
 
     if mech_quickstart_config.home_chain_id is None:
-        print("Select the chain for you service")
-        mech_quickstart_config.home_chain_id = input_select_chain([ChainType.GNOSIS]).id
+        mech_quickstart_config.home_chain_id = ChainType.GNOSIS.id
 
     if mech_quickstart_config.gnosis_rpc is None:
         mech_quickstart_config.gnosis_rpc = input(
