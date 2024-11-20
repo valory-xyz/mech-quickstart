@@ -322,8 +322,6 @@ def main() -> None:
     apply_env_vars(env_vars)
 
     # Build the deployment
-    # del os.environ["MAX_FEE_PER_GAS"]
-    # del os.environ["MAX_PRIORITY_FEE_PER_GAS"]
     service.deployment.build(use_docker=True, force=True, chain_id=home_chain_id)
 
     # Run the deployment
