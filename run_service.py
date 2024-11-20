@@ -71,12 +71,12 @@ CHAIN_ID_TO_METADATA = {
 }
 
 # @note patching operate -> legder -> profiles.py -> staking dict for gnosis
-STAKING[ChainType.GNOSIS]["mech_service"] = "0x998dEFafD094817EF329f6dc79c703f1CF18bC90"
+STAKING[ChainType.GNOSIS]["mech_marketplace"] = "0x998dEFafD094817EF329f6dc79c703f1CF18bC90"
 FALLBACK_STAKING_PARAMS = {
     ChainType.GNOSIS: dict(
         agent_ids=[37],
         service_registry=CONTRACTS[ChainType.GNOSIS]["service_registry"],  # nosec
-        staking_token=STAKING[ChainType.GNOSIS]["mech_service"],  # nosec
+        staking_token=STAKING[ChainType.GNOSIS]["mech_marketplace"],  # nosec
         service_registry_token_utility=CONTRACTS[ChainType.GNOSIS][
             "service_registry_token_utility"
         ],  # nosec
@@ -305,7 +305,7 @@ def main() -> None:
     mech_to_config = generate_mech_config(mech_quickstart_config)
     env_vars = {
         "SERVICE_REGISTRY_ADDRESS": CONTRACTS[home_chain_type]["service_registry"],
-        "STAKING_TOKEN_CONTRACT_ADDRESS": STAKING[home_chain_type]["mech_service"],
+        "STAKING_TOKEN_CONTRACT_ADDRESS": STAKING[home_chain_type]["mech_marketplace"],
         "MECH_MARKETPLACE_ADDRESS": CHAIN_TO_MARKETPLACE[home_chain_type],
         # TODO: no way to update this atm after its provided, user is expected to update the file itself.
         "API_KEYS": json.dumps(api_keys, separators=(',', ':')),
@@ -319,8 +319,8 @@ def main() -> None:
     apply_env_vars(env_vars)
 
     # Build the deployment
-    del os.environ["MAX_FEE_PER_GAS"]
-    del os.environ["MAX_PRIORITY_FEE_PER_GAS"]
+    # del os.environ["MAX_FEE_PER_GAS"]
+    # del os.environ["MAX_PRIORITY_FEE_PER_GAS"]
     service.deployment.build(use_docker=True, force=True, chain_id=home_chain_id)
 
     # Run the deployment
