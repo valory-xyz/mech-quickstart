@@ -41,7 +41,7 @@ OPERATE_HOME = Path.cwd() / ".mech_quickstart"
 DEFAULT_TOOLS_TO_PACKAGE_HASH = None
 DEFAULT_MECH_TO_SUBSCRIPTION = None
 DEFAULT_MECH_TO_CONFIG = None
-DEFAULT_MECH_HASH = "bafybeibx772eooap6m7cdjwfyt5pespe22i2mva24y255vw22cd5d7bfuq"
+DEFAULT_MECH_HASH = "bafybeig544gw6i7ahlwj6d64djlwfltjuznz3p66kmwk4m6bzqtn2bjfbq"
 
 @dataclass
 class MechQuickstartConfig(LocalResource):
@@ -280,8 +280,8 @@ def input_with_default_value(prompt: str, default_value: str) -> str:
 
 def input_select_chain(options: t.List[ChainType]):
     """Chose a single option from the offered ones"""
-    user_input = input(
-        f"Chose one of the following options {[option.name for option in options]}: "
+    user_input = input_with_default_value(
+        f"Chose one of the following options {[option.name for option in options]}", "GNOSIS"
     )
     try:
         return ChainType.from_string(user_input.upper())
@@ -316,13 +316,27 @@ def get_local_config() -> MechQuickstartConfig:
     print_section("API Key Configuration")
 
     if mech_quickstart_config.home_chain_id is None:
-        print("Select the chain for you service")
-        mech_quickstart_config.home_chain_id = input_select_chain([ChainType.GNOSIS]).id
+        mech_quickstart_config.home_chain_id = ChainType.GNOSIS.id
 
     if mech_quickstart_config.gnosis_rpc is None:
         mech_quickstart_config.gnosis_rpc = input(
             f"Please enter a {ChainType.from_id(mech_quickstart_config.home_chain_id).name} RPC URL: "
         )
+    
+    if mech_quickstart_config.mech_hash is None:
+        mech_hash = (
+                input(
+                    f"Do you want to set the mech_hash dict(set to {DEFAULT_MECH_HASH})? (y/n): "
+                ).lower()
+                == "y"
+        )
+        if mech_hash:
+            while True:
+                user_input = input(f"Please enter the mech_hash: ")
+                mech_quickstart_config.mech_hash = user_input
+                break
+        else:
+            mech_quickstart_config.mech_hash = DEFAULT_MECH_HASH
 
     if mech_quickstart_config.password_migrated is None:
         mech_quickstart_config.password_migrated = False
@@ -360,22 +374,6 @@ def get_local_config() -> MechQuickstartConfig:
             mech_quickstart_config.tools_to_packages_hash = (
                 DEFAULT_TOOLS_TO_PACKAGE_HASH
             )
-
-    if mech_quickstart_config.mech_hash is None:
-        mech_hash = (
-                input(
-                    f"Do you want to set the mech_hash dict(set to {DEFAULT_MECH_HASH})? (y/n): "
-                ).lower()
-                == "y"
-        )
-        if mech_hash:
-            while True:
-                user_input = input(f"Please enter the mech_hash: ")
-                mech_quickstart_config.mech_hash = user_input
-                break
-        else:
-            mech_quickstart_config.mech_hash = DEFAULT_MECH_HASH
-
 
     mech_quickstart_config.store()
     return mech_quickstart_config
