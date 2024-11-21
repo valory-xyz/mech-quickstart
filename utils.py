@@ -353,16 +353,10 @@ def get_local_config() -> MechQuickstartConfig:
             == "y"
         )
         if metadata_hash:
+            from setup_metadata_hash import setup_metadata_hash
             while True:
-                user_input = input(f"Please enter the metadata_hash str: ")
-                if not isinstance(user_input, str):
-                    print("Error: Please enter a valid str.")
-                    continue
-                else:
-                    mech_quickstart_config.metadata_hash = (
-                        user_input
-                    )
-                    break
+                setup_metadata_hash(mech_quickstart_config)
+                break
         else:
             mech_quickstart_config.metadata_hash = (
                 DEFAULT_MECH_METADATA_HASH
