@@ -312,7 +312,6 @@ def main() -> None:
         # TODO: no way to update this atm after its provided, user is expected to update the file itself.
         "API_KEYS": json.dumps(api_keys, separators=(',', ':')),
         "AGENT_ID": str(mech_quickstart_config.agent_id),
-        # TODO this will be very unclear for the general user how to come up with
         "METADATA_HASH": mech_quickstart_config.metadata_hash,
         "MECH_TO_CONFIG": json.dumps(mech_to_config, separators=(',', ':')),
         "ON_CHAIN_SERVICE_ID": service.chain_configs[home_chain_id].chain_data.token,
