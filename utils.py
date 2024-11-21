@@ -39,10 +39,8 @@ logging.basicConfig(level=logging.INFO, format='%(message)s')
 WARNING_ICON = colored("\u26A0", "yellow")
 OPERATE_HOME = Path.cwd() / ".mech_quickstart"
 DEFAULT_TOOLS_TO_PACKAGE_HASH = None
-DEFAULT_MECH_TO_SUBSCRIPTION = None
-DEFAULT_MECH_TO_CONFIG = None
 DEFAULT_MECH_HASH = "bafybeig544gw6i7ahlwj6d64djlwfltjuznz3p66kmwk4m6bzqtn2bjfbq"
-
+DEFAULT_MECH_METADATA_HASH = "f01701220caa53607238e340da63b296acab232c18a48e954f0af6ff2b835b2d93f1962f0"
 @dataclass
 class MechQuickstartConfig(LocalResource):
     """Local configuration."""
@@ -348,8 +346,27 @@ def get_local_config() -> MechQuickstartConfig:
     load_api_keys(mech_quickstart_config)
 
     if mech_quickstart_config.metadata_hash is None:
-        # TODO: default value is not a good idea here, we need to think of better ways to do this.
-        mech_quickstart_config.metadata_hash = input_with_default_value("Please provide the metadata hash", "f01701220caa53607238e340da63b296acab232c18a48e954f0af6ff2b835b2d93f1962f0")
+        metadata_hash = (
+            input(
+                f"Do you want to update the metadata_hash str(set to {DEFAULT_MECH_METADATA_HASH})? (y/n): "
+            ).lower()
+            == "y"
+        )
+        if metadata_hash:
+            while True:
+                user_input = input(f"Please enter the metadata_hash str: ")
+                if not isinstance(user_input, str):
+                    print("Error: Please enter a valid str.")
+                    continue
+                else:
+                    mech_quickstart_config.metadata_hash = (
+                        user_input
+                    )
+                    break
+        else:
+            mech_quickstart_config.metadata_hash = (
+                DEFAULT_MECH_METADATA_HASH
+            )
 
     if mech_quickstart_config.tools_to_packages_hash is None:
         tools_to_packages_hash = (

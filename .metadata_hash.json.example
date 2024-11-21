@@ -1,0 +1,10 @@
+{
+    "name": "Autonolas Mech Quickstart",
+    "description": "The mech executes AI tasks requested on-chain and delivers the results to the requester.",
+    "inputFormat": "ipfs-v0.1",
+    "outputFormat": "ipfs-v0.1",
+    "image": "https://gateway.autonolas.tech/ipfs/bafybeidzpenez565d7vp7jexfrwisa2wijzx6vwcffli57buznyyqkrceq",
+    "tools": [
+        "openai-gpt-4"
+    ]
+}
