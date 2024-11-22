@@ -120,7 +120,7 @@ Ensure your machine satisfies the requirements:
 3.  Run the quickstart:
 
     ```bash
-    python3 run_service.py
+    bash run_service.sh
     ```
 
     When prompted, add the requested info, send funds to the prompted address and you're good to go!
