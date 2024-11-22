@@ -54,3 +54,5 @@ local_config.json
 mech.db
 
 /.api_keys.json
+
+.metadata_hash.json

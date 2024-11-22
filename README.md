@@ -37,6 +37,72 @@ Ensure your machine satisfies the requirements:
 
 -   You need 1 RPC for your agent instance for Gnosis.
 
+## Setting up Mech metadata hash file
+
+1.  Copy over the sample from .metadata_hash.json.example. The example file is valid for a single tool.
+
+    ```
+    cp .metadata_hash.json.example .metadata_hash.json
+    ```
+
+2.  Define your top level key value pairs
+    | Name | Value Type | Description |
+    | :--- | :---: | :--- |
+    | Name | str | Name of your mech |
+    | Description | str | Description of your mech |
+    | inputFormat | str | Can leave it default |
+    | outputFormat | str | Can leave it default |
+    | image | str | Link to the imagerepresenting your mech |
+    | tools | List | List of AI tools your mech supports |
+    | toolMetadata | Dict | Provides more info on sprecific tools |
+
+> [!IMPORTANT] \
+> Each tool mentioned in `tools` should have a corresponding `key` in the `toolsMetadata`.
+
+3.  Define your key value pairs for each specific tools.
+
+    | Name         | Value Type | Description                             |
+    | :----------- | :--------: | :-------------------------------------- |
+    | Name         |    str     | Name of the AI tool                     |
+    | Description  |    str     | Description of the AI tool              |
+    | input        |    Dict    | Contains the input schema of the tool   |
+    | output       |    Dict    | Contains the output schema of the tool  |
+    | image        |    str     | Link to the imagerepresenting your mech |
+    | tools        |    List    | List of AI tools your mech supports     |
+    | toolMetadata |    Dict    | Provides more info on sprecific tools   |
+
+> [!IMPORTANT] \
+> Each field mentioned in `required` should have a corresponding `key` in the `properties`.
+
+4.  Define your key value pairs for the output schema
+
+    | Name       | Value Type | Description                                                  |
+    | :--------- | :--------: | :----------------------------------------------------------- |
+    | type       |    str     | Mentions the type of the schema                              |
+    | properties |    Dict    | Contains the required output data                            |
+    | required   |    List    | Contains the list of fields required in the `properties` key |
+
+5.  Define your key value pairs for the properties field
+
+    | Name      | Value Type | Description                                                   |
+    | :-------- | :--------: | :------------------------------------------------------------ |
+    | requestId |    Dict    | Contains the request id and it's description                  |
+    | result    |    Dict    | Contains the result and it's description with an example      |
+    | prompt    |    Dict    | Contains the prompt used for the request and it's description |
+
+## Setting up api keys file
+
+1. Copy over the sample from .api_keys.json.example.
+
+    ```
+    cp .api_keys.json.example .api_keys.json
+    ```
+
+2. Setup key value pairs for every AI tool your mech uses
+
+    - The name of the tool will be the `key` used in the file
+    - The value will be an array of valid API keys the tool can use
+
 ## Run the Service
 
 1.  Clone this repository:
@@ -53,9 +119,9 @@ Ensure your machine satisfies the requirements:
     ```
 3.  Run the quickstart:
 
-        ```bash
-        python run_service.py
-        ```
+    ```bash
+    bash run_service.sh
+    ```
 
     When prompted, add the requested info, send funds to the prompted address and you're good to go!
 
@@ -69,14 +135,6 @@ Creating a new local user account...
 Please enter a password:
 Please confirm your password:
 Creating the main wallet...
-```
-
-## Staking
-
-The agent will need your answer on staking. If you plan to run it as a non staking agent, please answer _n_ to the question below. Otherwise, please answer _y_ and, consequently when prompted, fund your agent with the required number of bridged Olas in Optimism Chain.
-
-```bash
-Do you want to stake your service? (y/n):
 ```
 
 ### Notes:

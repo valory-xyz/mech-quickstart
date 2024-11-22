@@ -228,6 +228,9 @@ class ServiceBuilder(BaseServiceBuilder):
                 #         "on_chain_service_id"
                 #     ] = service_id
 
+                # service id not used tmp workaround
+                print(f"{service_id=}")
+
             override["type"] = component_id.package_type.value
             override["public_id"] = str(component_id.public_id)
 
@@ -471,21 +474,6 @@ class Deployment(LocalResource):
             (build / volume).mkdir(exist_ok=True)
             _volumes.append(f"./{volume}:{mount}:Z")
 
-        # not needed and causes issues
-        # for node in deployment["services"]:
-        #     if "abci" in node:
-        #         deployment["services"][node]["volumes"].extend(_volumes)
-        #         if (
-        #             "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_MECH_REQUEST_PRICE=0"
-        #             in deployment["services"][node]["environment"]
-        #         ):
-        #             deployment["services"][node]["environment"].remove(
-        #                 "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_MECH_REQUEST_PRICE=0"
-        #             )
-        #             deployment["services"][node]["environment"].append(
-        #                 "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_MECH_REQUEST_PRICE=10000000000000000"
-        #             )
-
         with (build / DOCKER_COMPOSE_YAML).open("w", encoding="utf-8") as stream:
             yaml_dump(data=deployment, stream=stream)
 
@@ -566,9 +554,9 @@ class Deployment(LocalResource):
         # Mech price patch.
         agent_vars = json.loads(Path(build, "agent.json").read_text(encoding="utf-8"))
         if "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_MECH_REQUEST_PRICE" in agent_vars:
-            agent_vars["SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_MECH_REQUEST_PRICE"] = (
-                "10000000000000000"
-            )
+            agent_vars[
+                "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_MECH_REQUEST_PRICE"
+            ] = "10000000000000000"
             Path(build, "agent.json").write_text(
                 json.dumps(agent_vars, indent=4),
                 encoding="utf-8",
@@ -806,9 +794,9 @@ class Service(LocalResource):
     ) -> None:
         """Update user params from template."""
         for chain, config in service_template["configurations"].items():
-            self.chain_configs[chain].chain_data.user_params = (
-                OnChainUserParams.from_json(dict(config))
-            )
+            self.chain_configs[
+                chain
+            ].chain_data.user_params = OnChainUserParams.from_json(dict(config))
 
         self.store()
 
