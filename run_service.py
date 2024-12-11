@@ -103,7 +103,7 @@ def get_service_template(config: MechQuickstartConfig) -> ServiceTemplate:
                         "nft": "bafybeifgj3kackzfoq4fxjiuousm6epgwx7jbc3n2gjwzjgvtbbz7fc3su",
                         "cost_of_bond": COST_OF_BOND,
                         "threshold": 1,
-                        "use_staking": True,
+                        "use_staking": config.use_staking,
                         "fund_requirements": FundRequirementsTemplate(
                             {
                                 "agent": AGENT_TOPUP,

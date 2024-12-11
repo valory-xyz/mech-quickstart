@@ -320,6 +320,11 @@ def get_local_config() -> MechQuickstartConfig:
         mech_quickstart_config.gnosis_rpc = input(
             f"Please enter a {ChainType.from_id(mech_quickstart_config.home_chain_id).name} RPC URL: "
         )
+
+    if mech_quickstart_config.use_staking is None:
+        mech_quickstart_config.use_staking = input_with_default_value(
+            "Do you wish to use staking for your service? (True/False)" , False
+        )
     
     if mech_quickstart_config.mech_hash is None:
         mech_hash = (
