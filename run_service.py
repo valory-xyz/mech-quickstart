@@ -28,6 +28,7 @@ import typing as t
 from dotenv import load_dotenv
 from halo import Halo
 
+from web3.constants import ADDRESS_ZERO
 from operate.account.user import UserAccount
 from operate.cli import OperateApp
 from operate.ledger.profiles import CONTRACTS, STAKING, OLAS
@@ -309,6 +310,11 @@ def main() -> None:
         "SERVICE_REGISTRY_ADDRESS": CONTRACTS[home_chain_type]["service_registry"],
         "STAKING_TOKEN_CONTRACT_ADDRESS": STAKING[home_chain_type]["mech_marketplace"],
         "MECH_MARKETPLACE_ADDRESS": CHAIN_TO_MARKETPLACE[home_chain_type],
+        "MECH_STAKING_INSTANCE_ADDRESS": (
+            STAKING[ChainType.GNOSIS]["mech_marketplace"]
+            if mech_quickstart_config.use_staking
+            else ADDRESS_ZERO
+        ),
         # TODO: no way to update this atm after its provided, user is expected to update the file itself.
         "API_KEYS": json.dumps(api_keys, separators=(',', ':')),
         "AGENT_ID": str(mech_quickstart_config.agent_id),
