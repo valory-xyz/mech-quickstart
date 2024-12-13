@@ -28,6 +28,7 @@ from operate.services.protocol import EthSafeTxBuilder
 from operate.services.service import Service
 from operate.types import ChainType, ServiceTemplate, LedgerType, ConfigurationTemplate
 from operate.utils.gnosis import SafeOperation
+from operate.ledger.profiles import CONTRACTS
 
 # Set decimal precision
 getcontext().prec = 18
@@ -483,8 +484,9 @@ CHAIN_TO_MARKETPLACE = {
      ChainType.GNOSIS: "0x4554fE75c1f5576c1d7F765B2A036c199Adae329",
 }
 
-CHAIN_TO_AGENT_FACTORY = {
-    ChainType.GNOSIS: "0x6D8CbEbCAD7397c63347D44448147Db05E7d17B0",
+# @todo update after mainnet deployment
+CHAIN_TO_MECH_FACTORY = {
+    ChainType.GNOSIS: "",
 }
 
 def fetch_token_price(url: str, headers: dict) -> t.Optional[float]:
@@ -507,7 +509,7 @@ def deploy_mech(sftxb: EthSafeTxBuilder, local_config: MechQuickstartConfig, ser
     """Deploy the Mech service."""
     print_section("Creating a new Mech On Chain")
     chain_type = ChainType.from_id(int(local_config.home_chain_id))
-    path = OPERATE_HOME / Path("../contracts/MechAgentFactory.json")
+    path = OPERATE_HOME / Path("../contracts/MechFactoryBasic.json")
     abi = json.loads(path.read_text())["abi"]
     instance = web3.Web3()
 
@@ -516,26 +518,24 @@ def deploy_mech(sftxb: EthSafeTxBuilder, local_config: MechQuickstartConfig, ser
     # better to be configurable and part of local config
     mech_request_price = unit_to_wei(0.01)
     contract = instance.eth.contract(address=Web3.to_checksum_address(mech_marketplace_address), abi=abi)
-    data = contract.encodeABI("create", args=[
-        service.chain_configs[service.home_chain_id].chain_data.multisig,
-        bytes.fromhex(local_config.metadata_hash.lstrip("f01701220")),
-        mech_request_price,
-        mech_marketplace_address
+    data = contract.encodeABI("createMech", args=[
+        mech_marketplace_address,
+        CONTRACTS[local_config.home_chain_id]["service_registry"],
+        service.chain_data.token,
+        Web3.to_hex(Web3.to_bytes(mech_request_price)).rjust(66, '0'),
     ])
     tx_dict = {
-        "to": CHAIN_TO_AGENT_FACTORY[chain_type],
+        "to": CHAIN_TO_MECH_FACTORY[chain_type],
         "data": data,
         "value": 0,
         "operation": SafeOperation.CALL,
     }
     receipt = sftxb.new_tx().add(tx_dict).settle()
-    event = contract.events.CreateMech().process_receipt(receipt)[0]
-    mech_address, agent_id = event["args"]["mech"], event["args"]["agentId"]
+    event = contract.events.CreateBasicMech().process_receipt(receipt)[0]
+    mech_address = event["args"]["mech"]
     print(f"Mech address: {mech_address}")
-    print(f"Agent ID: {agent_id}")
 
     local_config.mech_address = mech_address
-    local_config.agent_id = agent_id
     local_config.store()
 
 def generate_mech_config(local_config: MechQuickstartConfig) -> dict:
