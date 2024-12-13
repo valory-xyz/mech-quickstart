@@ -486,7 +486,7 @@ CHAIN_TO_MARKETPLACE = {
 
 # @todo update after mainnet deployment
 CHAIN_TO_MECH_FACTORY = {
-    ChainType.GNOSIS: "",
+    ChainType.GNOSIS: "0x72FA6a00692BF99a8FCe97B9815302a02FA1E3D4",
 }
 
 def fetch_token_price(url: str, headers: dict) -> t.Optional[float]:
@@ -520,9 +520,9 @@ def deploy_mech(sftxb: EthSafeTxBuilder, local_config: MechQuickstartConfig, ser
     contract = instance.eth.contract(address=Web3.to_checksum_address(mech_marketplace_address), abi=abi)
     data = contract.encodeABI("createMech", args=[
         mech_marketplace_address,
-        CONTRACTS[local_config.home_chain_id]["service_registry"],
-        service.chain_data.token,
-        Web3.to_hex(Web3.to_bytes(mech_request_price)).rjust(66, '0'),
+        CONTRACTS[ChainType.from_id(local_config.home_chain_id)]["service_registry"],
+        service.chain_configs[str(local_config.home_chain_id)].chain_data.token,
+        mech_request_price.to_bytes(32, byteorder='big'),
     ])
     tx_dict = {
         "to": CHAIN_TO_MECH_FACTORY[chain_type],
