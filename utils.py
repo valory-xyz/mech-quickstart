@@ -479,14 +479,14 @@ def unit_to_wei(unit: float) -> int:
     """Convert unit to Wei."""
     return int(unit * 1e18)
 
-
+# @todo update after mainnet deployment
 CHAIN_TO_MARKETPLACE = {
-     ChainType.GNOSIS: "0x4554fE75c1f5576c1d7F765B2A036c199Adae329",
+    ChainType.GNOSIS: "0x4bfc6ba8413047db0067b9ef9004be8c07d25b51",
 }
 
 # @todo update after mainnet deployment
 CHAIN_TO_MECH_FACTORY = {
-    ChainType.GNOSIS: "0x72FA6a00692BF99a8FCe97B9815302a02FA1E3D4",
+    ChainType.GNOSIS: "0xac33a1cf83fd6890bbdf4b135da5dd6496767ab7",
 }
 
 def fetch_token_price(url: str, headers: dict) -> t.Optional[float]:
@@ -509,29 +509,29 @@ def deploy_mech(sftxb: EthSafeTxBuilder, local_config: MechQuickstartConfig, ser
     """Deploy the Mech service."""
     print_section("Creating a new Mech On Chain")
     chain_type = ChainType.from_id(int(local_config.home_chain_id))
-    path = OPERATE_HOME / Path("../contracts/MechFactoryBasic.json")
+    path = OPERATE_HOME / Path("../contracts/MechMarketplace.json")
     abi = json.loads(path.read_text())["abi"]
     instance = web3.Web3()
 
     mech_marketplace_address = CHAIN_TO_MARKETPLACE[chain_type]
+    mech_factory_address = CHAIN_TO_MECH_FACTORY[chain_type]
     # 0.01xDAI hardcoded for price
     # better to be configurable and part of local config
     mech_request_price = unit_to_wei(0.01)
     contract = instance.eth.contract(address=Web3.to_checksum_address(mech_marketplace_address), abi=abi)
-    data = contract.encodeABI("createMech", args=[
-        mech_marketplace_address,
-        CONTRACTS[ChainType.from_id(local_config.home_chain_id)]["service_registry"],
+    data = contract.encodeABI("create", args=[
         service.chain_configs[str(local_config.home_chain_id)].chain_data.token,
+        Web3.to_checksum_address(mech_factory_address),
         mech_request_price.to_bytes(32, byteorder='big'),
     ])
     tx_dict = {
-        "to": CHAIN_TO_MECH_FACTORY[chain_type],
+        "to": CHAIN_TO_MARKETPLACE[chain_type],
         "data": data,
         "value": 0,
         "operation": SafeOperation.CALL,
     }
     receipt = sftxb.new_tx().add(tx_dict).settle()
-    event = contract.events.CreateBasicMech().process_receipt(receipt)[0]
+    event = contract.events.CreateMech().process_receipt(receipt)[0]
     mech_address = event["args"]["mech"]
     print(f"Mech address: {mech_address}")
 
