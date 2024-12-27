@@ -48,6 +48,7 @@ class MechQuickstartConfig(LocalResource):
 
     path: Path
     gnosis_rpc: t.Optional[str] = None
+    mech_type: t.Optional[str] = None
     password_migrated: t.Optional[bool] = None
     use_staking: t.Optional[bool] = None
     api_keys_path: t.Optional[str] = None
@@ -322,6 +323,11 @@ def get_local_config() -> MechQuickstartConfig:
             f"Please enter a {ChainType.from_id(mech_quickstart_config.home_chain_id).name} RPC URL: "
         )
 
+    if mech_quickstart_config.mech_type is None:
+        mech_quickstart_config.mech_type = input_with_default_value(
+            "Which type of mech do you want to deploy? (Native/Token)" , "Native"
+        )
+
     if mech_quickstart_config.use_staking is None:
         mech_quickstart_config.use_staking = input_with_default_value(
             "Do you wish to use staking for your service? (True/False)" , False
@@ -481,12 +487,17 @@ def unit_to_wei(unit: float) -> int:
 
 # @todo update after mainnet deployment
 CHAIN_TO_MARKETPLACE = {
-    ChainType.GNOSIS: "0x4bfc6ba8413047db0067b9ef9004be8c07d25b51",
+    ChainType.GNOSIS: "0xa13c51f1edfade9c274e0067de55e476ee20e881",
 }
 
 # @todo update after mainnet deployment
-CHAIN_TO_MECH_FACTORY = {
-    ChainType.GNOSIS: "0xac33a1cf83fd6890bbdf4b135da5dd6496767ab7",
+CHAIN_TO_NATIVE_MECH_FACTORY = {
+    ChainType.GNOSIS: "0xdd880caaf026c52d50d2f1ff91f95cf83d175fd2",
+}
+
+# @todo update after mainnet deployment
+CHAIN_TO_TOKEN_MECH_FACTORY = {
+    ChainType.GNOSIS: "0xfe48dbcb92ebe155054abf6a8273f6be82d56232",
 }
 
 def fetch_token_price(url: str, headers: dict) -> t.Optional[float]:
@@ -509,12 +520,18 @@ def deploy_mech(sftxb: EthSafeTxBuilder, local_config: MechQuickstartConfig, ser
     """Deploy the Mech service."""
     print_section("Creating a new Mech On Chain")
     chain_type = ChainType.from_id(int(local_config.home_chain_id))
+    mech_type = local_config.mech_type
     path = OPERATE_HOME / Path("../contracts/MechMarketplace.json")
     abi = json.loads(path.read_text())["abi"]
     instance = web3.Web3()
 
     mech_marketplace_address = CHAIN_TO_MARKETPLACE[chain_type]
-    mech_factory_address = CHAIN_TO_MECH_FACTORY[chain_type]
+    if mech_type == 'Native':
+        mech_factory_address = CHAIN_TO_NATIVE_MECH_FACTORY[chain_type]
+
+    if mech_type == 'Token':
+        mech_factory_address = CHAIN_TO_TOKEN_MECH_FACTORY[chain_type]
+
     # 0.01xDAI hardcoded for price
     # better to be configurable and part of local config
     mech_request_price = unit_to_wei(0.01)
@@ -525,7 +542,7 @@ def deploy_mech(sftxb: EthSafeTxBuilder, local_config: MechQuickstartConfig, ser
         mech_request_price.to_bytes(32, byteorder='big'),
     ])
     tx_dict = {
-        "to": CHAIN_TO_MARKETPLACE[chain_type],
+        "to": mech_marketplace_address,
         "data": data,
         "value": 0,
         "operation": SafeOperation.CALL,
