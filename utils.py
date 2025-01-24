@@ -325,7 +325,7 @@ def get_local_config() -> MechQuickstartConfig:
 
     if mech_quickstart_config.mech_type is None:
         mech_quickstart_config.mech_type = input_with_default_value(
-            "Which type of mech do you want to deploy? (Native/Token)" , "Native"
+            "Which type of mech do you want to deploy? (Native/Token/Nevermine)" , "Native"
         )
 
     if mech_quickstart_config.use_staking is None:
@@ -487,17 +487,22 @@ def unit_to_wei(unit: float) -> int:
 
 # @todo update after mainnet deployment
 CHAIN_TO_MARKETPLACE = {
-    ChainType.GNOSIS: "0xa13c51f1edfade9c274e0067de55e476ee20e881",
+    ChainType.GNOSIS: "0x74867dc703cc99d0c537cd8385308b31d15d81f3",
 }
 
 # @todo update after mainnet deployment
 CHAIN_TO_NATIVE_MECH_FACTORY = {
-    ChainType.GNOSIS: "0xdd880caaf026c52d50d2f1ff91f95cf83d175fd2",
+    ChainType.GNOSIS: "0x021c68454d901b89ab8bcdbad3265006ccd9599f",
 }
 
 # @todo update after mainnet deployment
 CHAIN_TO_TOKEN_MECH_FACTORY = {
-    ChainType.GNOSIS: "0xfe48dbcb92ebe155054abf6a8273f6be82d56232",
+    ChainType.GNOSIS: "0x9ab943c841c6de524ea37a5ba6000bf318e924e6",
+}
+
+# @todo update after mainnet deployment
+CHAIN_TO_NVM_MECH_FACTORY = {
+    ChainType.GNOSIS: "0xf2086d71ac953035968068646273e1ca0bd9c5da",
 }
 
 def fetch_token_price(url: str, headers: dict) -> t.Optional[float]:
@@ -531,6 +536,9 @@ def deploy_mech(sftxb: EthSafeTxBuilder, local_config: MechQuickstartConfig, ser
 
     if mech_type == 'Token':
         mech_factory_address = CHAIN_TO_TOKEN_MECH_FACTORY[chain_type]
+
+    if mech_type == 'Nevermine':
+        mech_factory_address = CHAIN_TO_NVM_MECH_FACTORY[chain_type]
 
     # 0.01xDAI hardcoded for price
     # better to be configurable and part of local config
