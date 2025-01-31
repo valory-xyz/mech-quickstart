@@ -42,7 +42,7 @@ from operate.types import (
 )
 from utils import print_title, print_section, get_local_config, get_service, ask_confirm_password, \
     handle_password_migration, print_box, wei_to_token, get_erc20_balance, CHAIN_TO_MARKETPLACE, apply_env_vars, \
-    unit_to_wei, MechQuickstartConfig, OPERATE_HOME, load_api_keys, deploy_mech, generate_mech_config
+    unit_to_wei, MechQuickstartConfig, OPERATE_HOME, load_api_keys, load_tools_to_packages_hash,  deploy_mech, generate_mech_config
 
 load_dotenv()
 
@@ -305,6 +305,7 @@ def main() -> None:
 
     # Apply env cars
     api_keys = load_api_keys(mech_quickstart_config)
+    tools_to_packages_hash = load_tools_to_packages_hash(mech_quickstart_config)
     mech_to_config = generate_mech_config(mech_quickstart_config)
     env_vars = {
         "SERVICE_REGISTRY_ADDRESS": CONTRACTS[home_chain_type]["service_registry"],
@@ -321,7 +322,7 @@ def main() -> None:
         "METADATA_HASH": mech_quickstart_config.metadata_hash,
         "MECH_TO_CONFIG": json.dumps(mech_to_config, separators=(',', ':')),
         "ON_CHAIN_SERVICE_ID": service.chain_configs[home_chain_id].chain_data.token,
-        "TOOLS_TO_PACKAGE_HASH": mech_quickstart_config.tools_to_packages_hash,
+        "TOOLS_TO_PACKAGE_HASH": json.dumps(tools_to_packages_hash, separators=(',', ':')),
         "GNOSIS_RPC_0": mech_quickstart_config.gnosis_rpc,
     }
     apply_env_vars(env_vars)

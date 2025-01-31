@@ -52,10 +52,10 @@ class MechQuickstartConfig(LocalResource):
     password_migrated: t.Optional[bool] = None
     use_staking: t.Optional[bool] = None
     api_keys_path: t.Optional[str] = None
+    tools_to_packages_hash_path: t.Optional[str] = None
     metadata_hash: t.Optional[str] = None
     agent_id: t.Optional[int] = None
     mech_address: t.Optional[str] = None
-    tools_to_packages_hash: t.Optional[dict] = None
     mech_hash: t.Optional[str] = None
     home_chain_id: t.Optional[int] = None
 
@@ -304,6 +304,20 @@ def load_api_keys(local_config: MechQuickstartConfig) -> t.Dict[str, t.List[str]
         sys.exit(1)
     return api_keys
 
+def load_tools_to_packages_hash(local_config: MechQuickstartConfig) -> t.Dict[str, t.List[str]]:
+    """Load tools to packages dict from a file."""
+    try:
+        path = OPERATE_HOME / local_config.tools_to_packages_hash_path
+        with open(path, "r") as f:
+            load_tools_to_packages_hash = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: Tools to Packages hash file not found at {local_config.tools_to_packages_hash_path}")
+        sys.exit(1)
+    except json.JSONDecodeError:
+        print("Error: Tools to Packages hash file contains invalid JSON.")
+        sys.exit(1)
+    return load_tools_to_packages_hash
+
 
 def get_local_config() -> MechQuickstartConfig:
     """Get local mech_quickstart configuration."""
@@ -374,30 +388,14 @@ def get_local_config() -> MechQuickstartConfig:
                 DEFAULT_MECH_METADATA_HASH
             )
 
-    if mech_quickstart_config.tools_to_packages_hash is None:
-        tools_to_packages_hash = (
-            input(
-                f"Do you want to set the tools_to_packages_hash dict(set to {DEFAULT_TOOLS_TO_PACKAGE_HASH})? (y/n): "
-            ).lower()
-            == "y"
+    if mech_quickstart_config.tools_to_packages_hash_path is None:
+        mech_quickstart_config.tools_to_packages_hash_path = input_with_default_value(
+            "Please provide the path to your tools_to_packages_hash.json file",
+            "../.tools_to_packages_hash.json",
         )
-        if tools_to_packages_hash:
-            while True:
-                user_input = input(f"Please enter the tools_to_packages_hash dict: ")
-                tools_to_packages_hash = ast.literal_eval(user_input)
-                if not isinstance(tools_to_packages_hash, dict):
-                    print("Error: Please enter a valid dict.")
-                    continue
-                else:
-                    mech_quickstart_config.tools_to_packages_hash = (
-                        tools_to_packages_hash
-                    )
-                    break
-        else:
-            mech_quickstart_config.tools_to_packages_hash = (
-                DEFAULT_TOOLS_TO_PACKAGE_HASH
-            )
-
+        # test path exists and is valid json
+        load_tools_to_packages_hash(mech_quickstart_config)
+        
     mech_quickstart_config.store()
     return mech_quickstart_config
 
@@ -487,17 +485,17 @@ def unit_to_wei(unit: float) -> int:
 
 # @todo update after mainnet deployment
 CHAIN_TO_MARKETPLACE = {
-    ChainType.GNOSIS: "0x74867dc703cc99d0c537cd8385308b31d15d81f3",
+    ChainType.GNOSIS: "0xbe685c4d0b62d723b4d490dfa0c931504b450901",
 }
 
 # @todo update after mainnet deployment
 CHAIN_TO_NATIVE_MECH_FACTORY = {
-    ChainType.GNOSIS: "0x021c68454d901b89ab8bcdbad3265006ccd9599f",
+    ChainType.GNOSIS: "0x077960d414e7c82f6be2b09d851480489c111206",
 }
 
 # @todo update after mainnet deployment
 CHAIN_TO_TOKEN_MECH_FACTORY = {
-    ChainType.GNOSIS: "0x9ab943c841c6de524ea37a5ba6000bf318e924e6",
+    ChainType.GNOSIS: "0x69b7f5fed09356cb7d3c64b0b6783b9d1d8cc116",
 }
 
 # @todo update after mainnet deployment
