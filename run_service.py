@@ -295,7 +295,7 @@ def main() -> None:
 
 
     # deploy a mech if doesnt exist already
-    if not mech_quickstart_config.agent_id:
+    if not mech_quickstart_config.mech_address:
         chain_config = service.chain_configs[home_chain_id]
         ledger_config = chain_config.ledger_config
         sftxb = manager.get_eth_safe_tx_builder(ledger_config)
@@ -324,6 +324,7 @@ def main() -> None:
         "ON_CHAIN_SERVICE_ID": service.chain_configs[home_chain_id].chain_data.token,
         "TOOLS_TO_PACKAGE_HASH": json.dumps(tools_to_packages_hash, separators=(',', ':')),
         "GNOSIS_RPC_0": mech_quickstart_config.gnosis_rpc,
+        "AGENT_ID": 3
     }
     apply_env_vars(env_vars)
 
